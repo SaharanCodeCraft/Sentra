@@ -22,6 +22,13 @@ and provides:
 
 This system is designed as a **decision intelligence platform**, not a generic chatbot.
 
+## Project Structure
+
+- `frontend/` — React-based UI for SENTRA (handled by frontend team)
+- `app/` — Backend application (LLM, RAG, decision engine – work in progress)
+- `data/` — Policy documents and reference material
+- `docs/` — Design notes and architecture
+
 ## Project Status
 🚧 Active development (Jan–Feb)
 
