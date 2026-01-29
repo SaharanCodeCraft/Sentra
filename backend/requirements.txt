@@ -1,0 +1,6 @@
+fastapi
+uvicorn[standard]
+pydantic
+python-multipart
+llama-index
+qdrant-client
