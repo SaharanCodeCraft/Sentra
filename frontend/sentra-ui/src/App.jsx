@@ -1,116 +1,94 @@
+import React, { useState, useRef } from 'react';
+import './App.css';
+
 function App() {
+  const [input, setInput] = useState('');
+  const [showResult, setShowResult] = useState(false);
+  const resultRef = useRef(null);
+
+  const handleEvaluate = () => {
+    if (input.trim()) {
+      setShowResult(true);
+      setTimeout(() => {
+        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  };
+
   return (
-    /* Page background */
-    <div
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#0b0e14",
-        display: "flex",
-        justifyContent: "center",
-        padding: "32px",
-        boxSizing: "border-box",
-        fontFamily: "Inter, Arial, sans-serif",
-        color: "#e6e6e6",
-      }}
-    >
-      {/* App Canvas */}
-      <div
-        style={{
-          width: "100%",
-        }}
-      >
-        {/* Header */}
-        <header
-          style={{
-            marginBottom: "24px",
-            paddingBottom: "16px",
-            borderBottom: "1px solid #1f2430",
-          }}
-        >
-          <h1 style={{ marginBottom: "6px" }}>SENTRA</h1>
-          <p style={{ margin: 0, color: "#9aa0aa" }}>
-            AI Policy Governance & Decision Intelligence Platform
+    <div className="sentra-layout">
+      {/* Full-width Top Bar */}
+      <nav className="top-bar">
+        <div className="container-wide">
+          <div className="brand">SENTRA</div>
+          <div className="nav-menu">
+            <span>Governance</span>
+            <span>Compliance</span>
+            <span>API</span>
+          </div>
+        </div>
+      </nav>
+
+      {/* Centered Page Content */}
+      <main className="main-content">
+        <section className="hero-section">
+          <div className="badge">v1.0 Decision Intelligence</div>
+          <h1 className="hero-title">AI Policy Governance</h1>
+          <p className="hero-subtitle">
+            Automate policy enforcement and decision intelligence with Sentra's 
+            enterprise-grade evaluation engine.
           </p>
-        </header>
+        </section>
 
-        {/* Main Console */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "420px 1fr",
-            gap: "24px",
-          }}
-        >
-          {/* Decision Input */}
-          <section
-            style={{
-              backgroundColor: "#121826",
-              borderRadius: "10px",
-              padding: "20px",
-              border: "1px solid #1f2430",
-            }}
-          >
-            <h3 style={{ marginTop: 0 }}>Decision Input</h3>
+        <section className="page-block">
+          <div className="upload-box">
+            <div className="glow-icon">✦</div>
+            <h3>Contextualize Documentation</h3>
+            <p>Drop your internal policy PDFs or compliance JSONs here</p>
+            <button className="btn-secondary">Upload Files</button>
+          </div>
+        </section>
 
+        <section className="page-block">
+          <h2 className="section-heading">Decision Input</h2>
+          <div className="input-card-bg">
             <textarea
-              rows="8"
+              className="decision-textarea"
               placeholder="Example: Can an intern work remotely using a personal laptop?"
-              style={{
-                width: "100%",
-                padding: "12px",
-                fontSize: "14px",
-                backgroundColor: "#0b0e14",
-                color: "#e6e6e6",
-                border: "1px solid #1f2430",
-                borderRadius: "6px",
-                boxSizing: "border-box",
-              }}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
             />
+            <button className="btn-primary" onClick={handleEvaluate}>
+              Evaluate Decision
+            </button>
+          </div>
+        </section>
 
-            <div style={{ marginTop: "16px" }}>
-              <button
-                style={{
-                  width: "100%",
-                  padding: "12px",
-                  fontSize: "14px",
-                  backgroundColor: "#2f6feb",
-                  color: "#ffffff",
-                  border: "none",
-                  borderRadius: "6px",
-                  cursor: "pointer",
-                }}
-              >
-                Evaluate Decision
-              </button>
+        {showResult && (
+          <section className="results-container fade-in" ref={resultRef}>
+            <div className="res-card">
+              <span className="res-label">Evaluation Result</span>
+              <div className="res-row"><strong>Risk Level:</strong> <span className="risk-tag">High</span></div>
+              <div className="res-row"><strong>Policy Evidence:</strong> <span>Section 4.1.2</span></div>
+              <div className="res-row"><strong>Recommendation:</strong> <span>Deny Access</span></div>
+            </div>
+
+            <div className="res-card">
+              <span className="res-label">Reasoning</span>
+              <p className="res-text">Using personal hardware for internal tasks violates the managed device policy.</p>
+            </div>
+
+            <div className="res-card accent-left">
+              <span className="res-label">Safer Alternative</span>
+              <p className="res-text">Issue a corporate-managed device with pre-configured security protocols.</p>
             </div>
           </section>
+        )}
+      </main>
 
-          {/* Evaluation Result */}
-          <section
-            style={{
-              backgroundColor: "#121826",
-              borderRadius: "10px",
-              padding: "20px",
-              border: "1px solid #1f2430",
-              minHeight: "320px",
-            }}
-          >
-            <h3 style={{ marginTop: 0 }}>Evaluation Result</h3>
-
-            <p><strong>Risk Level:</strong> —</p>
-            <p><strong>Policy Evidence:</strong> —</p>
-            <p><strong>Recommendation:</strong> —</p>
-
-            <hr style={{ borderColor: "#1f2430", margin: "16px 0" }} />
-
-            <h4>Reasoning</h4>
-            <p>Explanation will appear here.</p>
-
-            <h4>Safer Alternative</h4>
-            <p>Suggested alternatives will appear here.</p>
-          </section>
-        </div>
-      </div>
+      <footer className="page-footer">
+        © 2026 SENTRA AI
+      </footer>
     </div>
   );
 }
