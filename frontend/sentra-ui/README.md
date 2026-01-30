@@ -1,16 +1,75 @@
-# React + Vite
+# SENTRA  
+### AI Policy Governance & Decision Intelligence Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+SENTRA is an AI-powered internal decision-support system designed to help organizations  
+**evaluate workplace decisions against official policy documents before execution**.
 
-Currently, two official plugins are available:
+Unlike generic AI chatbots, SENTRA focuses on **policy grounding, explainability, and risk awareness**, ensuring that decisions are compliant, traceable, and defensible.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## Problem Statement
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Organizational policies (HR, security, conduct, remote work, etc.) are often lengthy  
+and complex. Employees and managers frequently misinterpret these policies, leading to:
 
-## Expanding the ESLint configuration
+- Unintentional policy violations  
+- Compliance and legal risks  
+- Internal disputes and operational inefficiencies  
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Existing AI tools typically provide **generic answers** but lack:
+
+- Grounding in official policy documents  
+- Clear reasoning and traceability  
+- Explicit risk classification  
+
+---
+
+## What SENTRA Does
+
+SENTRA analyzes real-world workplace decision scenarios using official policy documents  
+and provides:
+
+- Policy-grounded evaluation  
+- Compliance risk classification (Low / Medium / High)  
+- Clear reasoning with policy references  
+- Safer, policy-compliant alternatives when applicable  
+
+This system is designed as a **decision intelligence platform**, not a generic chatbot.
+
+---
+
+## Project Structure
+
+- `frontend/` — React-based user interface (Vite)
+- `backend/` — FastAPI backend (API contracts, schemas, decision engine)
+- `app/` — Early exploratory modules (to be consolidated)
+- `docs/` — Design notes and architecture (planned)
+
+---
+
+## Project Status
+
+🚧 **Active development (Jan–Feb)**
+
+- Backend API foundation implemented (health check, decision evaluation endpoint)
+- Frontend UI skeleton initialized
+- Policy ingestion, RAG pipeline, and LLM-based reasoning engine under development
+
+---
+
+## Tech Stack
+
+### Frontend
+- React (Vite)
+
+### Backend
+- FastAPI  
+- Pydantic (data validation)  
+
+### AI / ML (Planned & In Progress)
+- Large Language Models (LLMs)  
+- Retrieval-Augmented Generation (RAG)  
+- Vector Database (Qdrant)
+
+---
