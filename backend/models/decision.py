@@ -1,13 +1,10 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 
-
 class DecisionInput(BaseModel):
     """
-    Represents a workplace decision scenario
-    that needs to be evaluated against policy documents.
+    Input schema for decision evaluation.
     """
-
     decision_text: str = Field(
         ...,
         min_length=10,
@@ -23,3 +20,14 @@ class DecisionInput(BaseModel):
         None,
         description="Urgency level (low, medium, high)"
     )
+
+
+class DecisionResponse(BaseModel):
+    """
+    Output schema for decision evaluation.
+    """
+    risk_level: str
+    policy_evidence: str
+    recommendation: str
+    reasoning: str
+    safer_alternative: str
