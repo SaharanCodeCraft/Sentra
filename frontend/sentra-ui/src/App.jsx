@@ -1,4 +1,6 @@
+// frontend/src/App.jsx
 import React, { useState, useRef } from 'react';
+import axios from 'axios';
 import './App.css';
 
 function App() {
@@ -6,10 +8,15 @@ function App() {
   const [showResult, setShowResult] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // State to store the REAL data from Python
+  const [apiResult, setApiResult] = useState(null);
   
   const resultRef = useRef(null);
   const fileInputRef = useRef(null);
 
+  // --- File Handling Logic ---
   const handleFiles = (files) => {
     const fileList = Array.from(files);
     const pdfs = fileList.filter(file => file.type === "application/pdf");
@@ -33,17 +40,62 @@ function App() {
     }
   };
 
-  const startUpload = () => {
-    alert(`Uploading ${uploadedFiles.length} files to SENTRA engine...`);
+  // --- API Connection: Upload ---
+  const startUpload = async () => {
+    if (uploadedFiles.length === 0) return;
+    
+    const formData = new FormData();
+    uploadedFiles.forEach(file => {
+      formData.append("files", file);
+    });
+
+    try {
+      alert(`Uploading ${uploadedFiles.length} files...`);
+      await axios.post("http://localhost:8000/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+      alert("Success! Documents indexed.");
+      setUploadedFiles([]);
+    } catch (error) {
+      console.error(error);
+      alert("Upload failed. Is the backend running?");
+    }
   };
 
-  const handleEvaluate = () => {
-    if (input.trim()) {
+  // --- API Connection: Analyze ---
+  const handleEvaluate = async () => {
+    if (!input.trim()) return;
+    
+    setIsLoading(true);
+    setShowResult(false);
+
+    try {
+      // Call Python Backend
+      const response = await axios.post("http://localhost:8000/analyze", {
+        text: input
+      });
+
+      setApiResult(response.data); // Store the real answer
       setShowResult(true);
+      
+      // Smooth scroll to result
       setTimeout(() => {
         resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
+
+    } catch (error) {
+      console.error(error);
+      alert("Analysis failed. Make sure backend is running on port 8000.");
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  // Helper function for dynamic styling
+  const getRiskColorClass = (level) => {
+    if (level === 'High') return 'risk-high';
+    if (level === 'Medium') return 'risk-medium';
+    return 'risk-low';
   };
 
   return (
@@ -69,6 +121,7 @@ function App() {
           </p>
         </section>
 
+        {/* Upload Section */}
         <section className="page-block upload-wrapper">
           <div 
             className={`upload-box ${isDragging ? 'dragging' : ''}`}
@@ -89,7 +142,10 @@ function App() {
               accept=".pdf"
             />
             
-            <button className="btn-secondary" onClick={() => fileInputRef.current.click()}>
+            <button className="btn-secondary" onClick={(e) => {
+               e.stopPropagation();
+               fileInputRef.current.click();
+            }}>
               Select Files
             </button>
 
@@ -117,6 +173,7 @@ function App() {
           )}
         </section>
 
+        {/* Input Section */}
         <section className="page-block">
           <h2 className="section-heading">Decision Input</h2>
           <div className="input-card-bg">
@@ -126,30 +183,51 @@ function App() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
             />
-            <button className="btn-primary" onClick={handleEvaluate}>
-              Evaluate Decision
+            <button 
+              className="btn-primary" 
+              onClick={handleEvaluate}
+              disabled={isLoading}
+            >
+              {isLoading ? "Analyzing Policies..." : "Evaluate Decision"}
             </button>
           </div>
         </section>
 
-        {showResult && (
+        {/* Dynamic Results Section */}
+        {showResult && apiResult && (
           <section className="results-container fade-in" ref={resultRef}>
             <div className="res-card">
               <span className="res-label">Evaluation Result</span>
-              <div className="res-row"><strong>Risk Level:</strong> <span className="risk-tag">High</span></div>
-              <div className="res-row"><strong>Policy Evidence:</strong> <span>Section 4.1.2</span></div>
-              <div className="res-row"><strong>Recommendation:</strong> <span>Deny Access</span></div>
+              
+              <div className="res-row">
+                <strong>Risk Level:</strong> 
+                <span className={`risk-tag ${getRiskColorClass(apiResult.riskLevel)}`}>
+                   {apiResult.riskLevel}
+                </span>
+              </div>
+              
+              <div className="res-row">
+                <strong>Policy Evidence:</strong> 
+                <span>{apiResult.evidence}</span>
+              </div>
+              
+              <div className="res-row">
+                <strong>Recommendation:</strong> 
+                <span>{apiResult.recommendation}</span>
+              </div>
             </div>
             
             <div className="res-card">
               <span className="res-label">Reasoning</span>
-              <p className="res-text">Using personal hardware violates corporate security protocols for level-3 data.</p>
+              <p className="res-text">{apiResult.reasoning}</p>
             </div>
 
-            <div className="res-card accent-left">
-              <span className="res-label">Safer Alternative</span>
-              <p className="res-text">Provision a managed device or use the encrypted VDI portal.</p>
-            </div>
+            {apiResult.alternatives && (
+              <div className="res-card accent-left">
+                <span className="res-label">Safer Alternative</span>
+                <p className="res-text">{apiResult.alternatives}</p>
+              </div>
+            )}
           </section>
         )}
       </main>
