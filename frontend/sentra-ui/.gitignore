@@ -1,3 +1,28 @@
+<<<<<<< HEAD
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+.env/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# Logs
+*.log
+=======
 # Logs
 logs
 *.log
@@ -22,3 +47,4 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+>>>>>>> b662688 (Initial setup: React frontend)
