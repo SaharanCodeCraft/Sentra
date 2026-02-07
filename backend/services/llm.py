@@ -1,5 +1,56 @@
 from typing import Dict
 
+DECISION_PROMPT_TEMPLATE = """
+You are an internal policy decision analyst.
+
+Your task:
+- Evaluate the given workplace decision strictly using the provided policy evidence.
+- Do NOT assume facts not present in the policy evidence.
+- If evidence is weak or missing, state uncertainty clearly.
+
+Decision:
+{decision_text}
+
+Policy Evidence:
+{policy_context}
+
+Instructions:
+1. Classify compliance risk as one of: Low, Medium, High.
+2. Explain reasoning with direct reference to policy evidence.
+3. Provide a clear recommendation.
+4. Suggest a safer, policy-compliant alternative.
+
+Respond ONLY in the following JSON format:
+{{
+  "risk_level": "<Low|Medium|High>",
+  "policy_evidence": "<summary of relevant clauses>",
+  "recommendation": "<recommended action>",
+  "reasoning": "<clear explanation>",
+  "safer_alternative": "<safer alternative>"
+}}
+"""
+ALLOWED_RISK_LEVELS = {"Low", "Medium", "High"}
+
+
+def normalize_risk_level(value: str, confidence: float | None = None) -> str:
+    """
+    Ensures risk level is valid and applies conservative defaults.
+    """
+    if not value:
+        return "Medium"
+
+    value = value.strip().capitalize()
+
+    if value not in ALLOWED_RISK_LEVELS:
+        return "Medium"
+
+    # Conservative downgrade if confidence is low
+    if confidence is not None and confidence < 0.5:
+        return "High"
+
+    return value
+
+
 
 class LLMClient:
     """
@@ -15,42 +66,49 @@ class LLMClient:
         "safer_alternative": "",
     }
 
+    
+    
     def evaluate_decision(
         self,
         decision_text: str,
         policy_context: str
     ) -> Dict[str, str]:
-        """
-        Evaluate a decision using policy context and
-        return normalized reasoning output.
-        """
 
-        # Placeholder reasoning logic (to be replaced by real LLM)
+        prompt = DECISION_PROMPT_TEMPLATE.format(
+            decision_text=decision_text,
+            policy_context=policy_context
+        )
+
+        # Placeholder logic — real LLM call will replace this
         raw_output = {
             "risk_level": "Medium",
             "policy_evidence": policy_context[:300],
             "recommendation": "Proceed with caution.",
             "reasoning": (
-                "Based on the provided policy context, the decision "
-                "may involve compliance considerations that require review."
+                "The decision involves areas covered by the provided policy evidence. "
+                "Potential compliance risks exist due to ambiguity."
             ),
             "safer_alternative": (
-                "Consider an alternative approach that aligns more closely "
-                "with documented policy guidelines."
+                "Adopt an approach explicitly allowed by policy to reduce risk."
             ),
         }
 
         return self._normalize_output(raw_output)
 
-    def _normalize_output(self, output: Dict[str, str]) -> Dict[str, str]:
-        """
-        Ensures all required fields exist and are strings.
-        """
 
+    def _normalize_output(self, output: Dict[str, str]) -> Dict[str, str]:
         normalized = {}
 
-        for key, default in self.REQUIRED_FIELDS.items():
-            value = output.get(key, default)
-            normalized[key] = str(value) if value is not None else default
+        risk = output.get("risk_level", "Medium")
+        confidence = output.get("retrieval_confidence", None)
+
+        normalized["risk_level"] = normalize_risk_level(risk, confidence)
+        normalized["policy_evidence"] = str(output.get("policy_evidence", ""))
+        normalized["recommendation"] = str(output.get("recommendation", ""))
+        normalized["reasoning"] = str(output.get("reasoning", ""))
+        normalized["safer_alternative"] = str(output.get("safer_alternative", ""))
 
         return normalized
+
+    
+    
