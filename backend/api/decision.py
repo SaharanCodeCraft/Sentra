@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from models.decision import DecisionInput, DecisionResponse
-from core.decision_engine import DecisionEngine
+from backend.models.decision import DecisionInput, DecisionResponse
+from backend.core.decision_engine import DecisionEngine
 
 router = APIRouter()
 engine = DecisionEngine()
@@ -13,15 +13,9 @@ def evaluate_decision(payload: DecisionInput):
     
     """
     result = engine.evaluate(
-        decision_text=payload.decision_text,
-        policy_context="Policy retrieval will be plugged in via RAG."
+    decision_text=payload.decision_text,
+    rag_result=None  # RAG will be plugged in later
     )
 
     
-    return DecisionResponse(
-        risk_level="Medium",
-        policy_evidence="Relevant policy clauses will be listed here.",
-        recommendation="Proceed with caution.",
-        reasoning="This is a placeholder explanation.",
-        safer_alternative="Consider a more policy-compliant alternative."
-    )
+    return DecisionResponse(**result)
