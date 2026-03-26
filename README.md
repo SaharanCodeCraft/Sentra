@@ -1,76 +1,220 @@
-# SENTRA  
-### AI Policy Governance & Decision Intelligence Platform
+# SENTRA | AI Policy Decision Intelligence System 🧠📜
 
-SENTRA is an AI-powered internal decision-support system designed to help organizations  
-**evaluate workplace decisions against official policy documents before execution**.
+![Platform](https://img.shields.io/badge/Platform-Web%20Application-informational)
+![API](https://img.shields.io/badge/API-FastAPI-0ba360)
+![LLM](https://img.shields.io/badge/LLM-Llama3%20\(Ollama\)-blue)
+![Architecture](https://img.shields.io/badge/Architecture-RAG%20Pipeline-purple)
+![Frontend](https://img.shields.io/badge/Frontend-React%20%2B%20Vite-646cff)
+![Status](https://img.shields.io/badge/Status-Production--Oriented-success)
 
-Unlike generic AI chatbots, SENTRA focuses on **policy grounding, explainability, and risk awareness**, ensuring that decisions are compliant, traceable, and defensible.
+SENTRA is an AI-powered decision intelligence system designed to evaluate workplace decisions against organizational policies **before execution**, enabling structured, explainable, and risk-aware outcomes.
 
----
-
-## Problem Statement
-
-Organizational policies (HR, security, conduct, remote work, etc.) are often lengthy  
-and complex. Employees and managers frequently misinterpret these policies, leading to:
-
-- Unintentional policy violations  
-- Compliance and legal risks  
-- Internal disputes and operational inefficiencies  
-
-Existing AI tools typically provide **generic answers** but lack:
-
-- Grounding in official policy documents  
-- Clear reasoning and traceability  
-- Explicit risk classification  
+It demonstrates production-focused AI engineering practices such as structured LLM output enforcement, retrieval-augmented reasoning, modular backend design, confidence scoring, and robust API-driven architecture.
 
 ---
 
-## What SENTRA Does
+### ✨ Key Features
 
-SENTRA analyzes real-world workplace decision scenarios using official policy documents  
-and provides:
-
-- Policy-grounded evaluation  
-- Compliance risk classification (Low / Medium / High)  
-- Clear reasoning with policy references  
-- Safer, policy-compliant alternatives when applicable  
-
-This system is designed as a **decision intelligence platform**, not a generic chatbot.
-
----
-
-## Project Structure
-
-- `frontend/` — React-based user interface (Vite)
-- `backend/` — FastAPI backend (API contracts, schemas, decision engine)
-- `app/` — Early exploratory modules (to be consolidated)
-- `docs/` — Design notes and architecture (planned)
+* Policy-aware decision evaluation using LLM + RAG pipeline
+* Structured JSON output with strict schema enforcement
+* Confidence scoring for decision reliability
+* Risk classification: LOW / MEDIUM / HIGH
+* Explainable reasoning with policy-backed evidence
+* Safer alternative recommendation engine
+* Fault-tolerant LLM integration (regex parsing + fallback handling)
+* Modular architecture (retrieval layer + reasoning layer separation)
+* Clean REST API contract for frontend integration
 
 ---
 
-## Project Status
+### 🧠 Problem Statement
 
-🚧 **Active development (Jan–Feb)**
+Organizational policies (HR, compliance, security, remote work) are often lengthy and complex. Employees and managers frequently:
 
-- Backend API foundation implemented (health check, decision evaluation endpoint)
-- Frontend UI skeleton initialized
-- Policy ingestion, RAG pipeline, and LLM-based reasoning engine under development
+* misinterpret policies
+* make inconsistent decisions
+* introduce compliance risks
+* lack structured decision support
 
----
+Generic AI tools fail because they:
 
-## Tech Stack
+* are not grounded in policy documents
+* produce unstructured outputs
+* lack explainability
+* provide no risk awareness
 
-### Frontend
-- React (Vite)
-
-### Backend
-- FastAPI  
-- Pydantic (data validation)  
-
-### AI / ML (Planned & In Progress)
-- Large Language Models (LLMs)  
-- Retrieval-Augmented Generation (RAG)  
-- Vector Database (Qdrant)
+SENTRA addresses this by combining **policy retrieval + LLM reasoning + structured decision intelligence**.
 
 ---
 
+## 🧩 System Design
+
+### 🟢 Stage 1 - Policy Retrieval (RAG Layer)
+
+Retrieves relevant policy context for a given decision:
+
+* semantic retrieval (vector DB ready - Qdrant planned)
+* contextual evidence extraction
+* confidence-aware retrieval output
+
+Answers:
+**"What policies are relevant to this decision?"**
+
+---
+
+### 🟡 Stage 2 - Decision Intelligence (LLM Layer)
+
+Transforms policy context into structured decision output:
+
+* risk classification (LOW / MEDIUM / HIGH)
+* confidence scoring
+* reasoning generation
+* recommendation engine
+* safer alternative suggestion
+
+Answers:
+**"Is this decision safe, and what should be done?"**
+
+---
+
+## 🏗 System Architecture
+
+React Frontend (Vite)
+↓
+FastAPI Backend
+↓
+Decision Engine (Orchestration Layer)
+↓
+Retriever (RAG Layer)
+↓
+LLM (Llama3 via Ollama)
+↓
+Structured JSON Output
+
+Architecture principles:
+
+* clear separation between retrieval and reasoning
+* LLM output normalization and validation
+* modular and extensible backend design
+* API-first communication
+* scalable for enterprise policy systems
+
+---
+
+### 📦 Project Structure
+
+```text
+SENTRA/
+│
+├── backend/
+│   ├── api/
+│   ├── core/
+│   ├── models/
+│   ├── services/
+│   ├── rag/
+│   └── main.py
+│
+├── frontend/
+├── data/
+├── docs/
+├── requirements.txt
+└── README.md
+```
+
+---
+
+## 🔌 API Specification
+
+### POST /evaluate
+
+#### Request
+
+```json
+{
+  "decision_text": "Allow employee to work remotely without approval",
+  "department": "HR",
+  "urgency": "medium"
+}
+```
+
+#### Response
+
+```json
+{
+  "risk_level": "High",
+  "confidence_score": 0.82,
+  "policy_evidence": "Remote work requires prior approval...",
+  "recommendation": "Seek approval before proceeding",
+  "reasoning": "Policy explicitly restricts unapproved remote work",
+  "safer_alternative": "Submit formal approval request"
+}
+```
+
+---
+
+### 🛠 Tech Stack
+
+* Backend: Python, FastAPI
+* LLM: Llama3 (via Ollama)
+* Architecture: RAG (Retrieval-Augmented Generation)
+* Vector DB (Planned): Qdrant
+* Frontend: React, Vite
+* Integration: REST API
+
+---
+
+### ▶ Running Locally
+
+#### Backend
+
+```bash
+pip install -r requirements.txt
+uvicorn backend.main:app --reload
+```
+
+Runs at:
+
+http://127.0.0.1:8000
+Docs: http://127.0.0.1:8000/docs
+
+---
+
+#### Frontend
+
+```bash
+cd frontend/sentra-ui
+npm install
+npm run dev
+```
+
+Runs at:
+
+http://localhost:5173
+
+---
+
+### ⚙ Key Engineering Decisions
+
+* enforced structured LLM outputs using schema validation
+* regex-based JSON extraction for handling inconsistent LLM responses
+* fallback mechanisms to ensure API stability
+* modular decision engine separating retrieval and reasoning
+* confidence scoring to improve interpretability
+* API-first backend for scalable integration
+
+---
+
+### 🚧 Future Improvements
+
+* Full vector database integration (Qdrant)
+* Multi-agent LLM architecture
+* Policy document ingestion pipeline
+* Decision audit logs and tracking
+* Dockerization and cloud deployment
+* Observability and monitoring
+
+---
+
+### 📄 License
+
+Developed for educational and portfolio demonstration purposes.
