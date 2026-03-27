@@ -2,25 +2,23 @@ import React, { useState, useRef } from 'react';
 import './App.css';
 
 function App() {
+  // --- UI State ---
   const [input, setInput] = useState('');
   const [showResult, setShowResult] = useState(false);
   const resultRef = useRef(null);
 
-  // --- NEW STATE FOR FILE UPLOAD ---
+  // --- Upload State ---
   const [isDragging, setIsDragging] = useState(false);
   const [uploadStatus, setUploadStatus] = useState(''); // 'idle', 'uploading', 'success', 'error'
   const fileInputRef = useRef(null);
 
-  const handleEvaluate = () => {
-    if (input.trim()) {
-      setShowResult(true);
-      setTimeout(() => {
-        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-    }
-  };
+  // --- Analysis State ---
+  const [analysis, setAnalysis] = useState(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  // --- NEW DRAG AND DROP HANDLERS ---
+  // ==========================================
+  // 1. DRAG AND DROP HANDLERS
+  // ==========================================
   const onDragOver = (e) => {
     e.preventDefault();
     setIsDragging(true);
@@ -47,18 +45,18 @@ function App() {
     }
   };
 
-  // --- API CALL TO YOUR PYTHON BACKEND ---
+  // ==========================================
+  // 2. BACKEND API: UPLOAD (Ingestion)
+  // ==========================================
   const uploadFiles = async (files) => {
     setUploadStatus('uploading');
     
-    // Create FormData object to send files correctly
     const formData = new FormData();
     files.forEach(file => {
-      formData.append('files', file); // 'files' must match the Python backend parameter
+      formData.append('files', file);
     });
 
     try {
-      // Sending to the local FastAPI server we just started
       const response = await fetch('http://localhost:8000/upload', {
         method: 'POST',
         body: formData,
@@ -66,7 +64,6 @@ function App() {
 
       if (response.ok) {
         setUploadStatus('success');
-        // Reset back to idle after 3 seconds
         setTimeout(() => setUploadStatus(''), 3000); 
       } else {
         setUploadStatus('error');
@@ -77,9 +74,52 @@ function App() {
     }
   };
 
+  // ==========================================
+  // 3. BACKEND API: EVALUATE (RAG Retrieval)
+  // ==========================================
+  const handleEvaluate = async () => {
+    if (!input.trim()) return;
+
+    setIsAnalyzing(true);
+    setShowResult(true); 
+    setAnalysis(null);
+
+    try {
+      const response = await fetch('http://localhost:8000/analyze', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: input }), 
+      });
+
+      const data = await response.json();
+      setAnalysis(data);
+
+      setTimeout(() => {
+        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+      
+    } catch (error) {
+      console.error("Analysis failed:", error);
+      setAnalysis({ 
+        riskLevel: "Error", 
+        evidence: "Connection failed", 
+        recommendation: "Check backend", 
+        reasoning: "Could not connect to localhost:8000", 
+        alternatives: "Make sure uvicorn is running." 
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  // ==========================================
+  // 4. UI RENDER
+  // ==========================================
   return (
     <div className="sentra-layout">
-      {/* Full-width Top Bar */}
+      {/* Navigation */}
       <nav className="top-bar">
         <div className="container-wide">
           <div className="brand">SENTRA</div>
@@ -91,8 +131,8 @@ function App() {
         </div>
       </nav>
 
-      {/* Centered Page Content */}
       <main className="main-content">
+        {/* Hero Section */}
         <section className="hero-section">
           <div className="badge">v1.0 Decision Intelligence</div>
           <h1 className="hero-title">AI Policy Governance</h1>
@@ -102,8 +142,8 @@ function App() {
           </p>
         </section>
 
+        {/* Upload Section */}
         <section className="page-block">
-          {/* UPDATED UPLOAD BOX */}
           <div 
             className={`upload-box ${isDragging ? 'drag-active' : ''}`}
             onDragOver={onDragOver}
@@ -127,7 +167,6 @@ function App() {
               <p>Drop your internal policy PDFs or compliance JSONs here</p>
             )}
 
-            {/* Hidden File Input */}
             <input 
               type="file" 
               multiple 
@@ -147,6 +186,7 @@ function App() {
           </div>
         </section>
 
+        {/* Input Section */}
         <section className="page-block">
           <h2 className="section-heading">Decision Input</h2>
           <div className="input-card-bg">
@@ -156,30 +196,44 @@ function App() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
             />
-            <button className="btn-primary" onClick={handleEvaluate}>
-              Evaluate Decision
+            <button className="btn-primary" onClick={handleEvaluate} disabled={isAnalyzing}>
+              {isAnalyzing ? "Analyzing..." : "Evaluate Decision"}
             </button>
           </div>
         </section>
 
+        {/* Results Section */}
         {showResult && (
           <section className="results-container fade-in" ref={resultRef}>
-            <div className="res-card">
-              <span className="res-label">Evaluation Result</span>
-              <div className="res-row"><strong>Risk Level:</strong> <span className="risk-tag">High</span></div>
-              <div className="res-row"><strong>Policy Evidence:</strong> <span>Section 4.1.2</span></div>
-              <div className="res-row"><strong>Recommendation:</strong> <span>Deny Access</span></div>
-            </div>
+            {isAnalyzing ? (
+              <div className="res-card" style={{ textAlign: 'center', padding: '2rem' }}>
+                <p className="res-text">Consulting Policy Knowledge Base...</p>
+              </div>
+            ) : analysis ? (
+              <>
+                <div className="res-card">
+                  <span className="res-label">Evaluation Result</span>
+                  <div className="res-row">
+                    <strong>Risk Level:</strong> 
+                    <span className={`risk-tag ${analysis.riskLevel === 'High' ? 'high' : analysis.riskLevel === 'Low' ? 'low' : 'medium'}`}>
+                      {analysis.riskLevel}
+                    </span>
+                  </div>
+                  <div className="res-row"><strong>Policy Evidence:</strong> <span>{analysis.evidence}</span></div>
+                  <div className="res-row"><strong>Recommendation:</strong> <span>{analysis.recommendation}</span></div>
+                </div>
 
-            <div className="res-card">
-              <span className="res-label">Reasoning</span>
-              <p className="res-text">Using personal hardware for internal tasks violates the managed device policy.</p>
-            </div>
+                <div className="res-card">
+                  <span className="res-label">Reasoning / Policy Extract</span>
+                  <p className="res-text">{analysis.reasoning}</p>
+                </div>
 
-            <div className="res-card accent-left">
-              <span className="res-label">Safer Alternative</span>
-              <p className="res-text">Issue a corporate-managed device with pre-configured security protocols.</p>
-            </div>
+                <div className="res-card accent-left">
+                  <span className="res-label">Safer Alternative</span>
+                  <p className="res-text">{analysis.alternatives}</p>
+                </div>
+              </>
+            ) : null}
           </section>
         )}
       </main>
