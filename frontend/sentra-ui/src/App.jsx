@@ -136,11 +136,7 @@ function App() {
       <nav className="top-bar">
         <div className="container-wide">
           <div className="brand">SENTRA</div>
-          <div className="nav-menu">
-            <span>Governance</span>
-            <span>Compliance</span>
-            <span>API</span>
-          </div>
+          {/* The nav-menu containing Governance, Compliance, and API has been removed */}
         </div>
       </nav>
 
@@ -181,7 +177,7 @@ function App() {
             </button>
           </div>
 
-          {/* --- NEW: FILE LIST AND WARNING TEXT --- */}
+          {/* --- FILE LIST AND WARNING TEXT --- */}
           <div className="upload-footer">
             {showWarning && (
               <p className="warning-text blink">⚠️ Please add a policy file first.</p>
@@ -230,8 +226,8 @@ function App() {
               <div className="single-res-card">
                 <div className="res-header-flex">
                   <h3 className="res-card-title">Evaluation Result</h3>
-                  <span className={`risk-badge ${analysis.riskLevel.toLowerCase()}`}>
-                    {analysis.riskLevel} Risk
+                  <span className={`risk-badge ${analysis.riskLevel?.trim().toLowerCase() || 'unknown'}`}>
+                    {analysis.riskLevel?.trim() || 'Unknown'} Risk
                   </span>
                 </div>
                 <hr className="res-divider" />

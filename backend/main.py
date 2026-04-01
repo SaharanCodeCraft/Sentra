@@ -124,28 +124,28 @@ async def analyze_scenario(request: AnalysisRequest):
 
         # Step 3: Ask your local Ollama LLM to analyze the decision based on the text
         prompt = f"""
-        You are a ruthless, strict AI Policy Governance auditor named Sentra.
-        You must evaluate the raw DECISION exactly as it is requested. Do NOT assume the user has special permissions.
+        You are a strict compliance auditor named Sentra. You must output valid JSON.
         
         DECISION: {request.text}
+        POLICY EVIDENCE: {found_text}
         
-        POLICY EVIDENCE: 
-        The text below contains up to 8 disconnected excerpts retrieved from the company rulebook. They are separated by "--- NEXT POLICY EXCERPT ---". They may not be sequentially related. Scan them independently to find the relevant rule.
+        INSTRUCTIONS:
+        Analyze the DECISION against the POLICY EVIDENCE. Assign a RISK_LEVEL from this exact list: ["High", "Medium", "Low", "Unknown"].
         
-        {found_text}
+        MAPPING RULES:
+        - "Unknown" = The evidence has nothing to do with the decision (e.g., asking about games, but the policy is about hardware).
+        - "High" = The evidence states the action is strictly prohibited, denied, or a violation.
+        - "Medium" = The evidence states the action requires manager approval, forms, or IT permission.
+        - "Low" = The evidence states the action is explicitly allowed for everyone.
         
-        Determine the risk level using these UNBREAKABLE rules in order:
-        1. RELEVANCE CHECK: If NONE of the excerpts mention or relate to the user's DECISION at all, the riskLevel MUST be "Unknown".
-        2. IF ANY excerpt says the action is "strictly prohibited", "not allowed", or violates the policy -> riskLevel MUST be "High". (Even if an exception process exists).
-        3. IF the decision requires manager approval before proceeding -> riskLevel MUST be "Medium".
-        4. IF the decision is explicitly allowed without special permission -> riskLevel MUST be "Low".
-        
-        You must return a JSON object with exactly these 5 keys:
-        - "riskLevel": Must be exactly "Low", "Medium", "High", or "Unknown".
-        - "evidence": Extract the exact 1-2 sentences proving this. (If Unknown, write "No relevant policy found in the database.")
-        - "recommendation": A strict 2-3 word directive (e.g., "Deny Request", "Approve Request", "Manual Review Needed").
-        - "reasoning": Explain the risk. IF UNKNOWN: State clearly that the uploaded documents do not contain rules regarding this specific request.
-        - "alternatives": Provide the safe alternative. IF UNKNOWN: Write "Consult HR or IT directly for unlisted policies."
+        OUTPUT FORMAT (JSON ONLY):
+        {{
+            "riskLevel": "[Insert exact RISK_LEVEL here]",
+            "evidence": "[Extract 1 sentence of proof from the policy. If Unknown, write 'No policy found.']",
+            "recommendation": "[2-3 words, e.g., 'Deny Request', 'Approve Request']",
+            "reasoning": "[1 sentence explaining why. If Unknown, explain that the policy doesn't cover this.]",
+            "alternatives": "[1 practical safe alternative step for the user]"
+        }}
         """
 
         try:
