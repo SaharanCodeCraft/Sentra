@@ -123,32 +123,17 @@ SENTRA/
 
 ---
 
-## 🔌 API Specification
 
-### POST /evaluate
+## 📸Screenshots
 
-#### Request
 
-```json
-{
-  "decision_text": "Allow employee to work remotely without approval",
-  "department": "HR",
-  "urgency": "medium"
-}
-```
+<img width="3200" height="1728" alt="Screenshot 2026-04-01 095909" src="https://github.com/user-attachments/assets/db683509-1bad-4c99-98f1-2ae789785ce3" />
 
-#### Response
+<img width="3200" height="1734" alt="Screenshot 2026-04-01 095947" src="https://github.com/user-attachments/assets/71e81149-3887-41d0-95f0-9f37689c3921" />
 
-```json
-{
-  "risk_level": "High",
-  "confidence_score": 0.82,
-  "policy_evidence": "Remote work requires prior approval...",
-  "recommendation": "Seek approval before proceeding",
-  "reasoning": "Policy explicitly restricts unapproved remote work",
-  "safer_alternative": "Submit formal approval request"
-}
-```
+<img width="3200" height="1720" alt="Screenshot 2026-04-01 100035" src="https://github.com/user-attachments/assets/a4d39de9-fed8-499d-b547-e361190c1e35" />
+
+
 
 ---
 
