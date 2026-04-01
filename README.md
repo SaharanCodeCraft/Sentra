@@ -17,7 +17,6 @@ It demonstrates production-focused AI engineering practices such as structured L
 
 * Policy-aware decision evaluation using LLM + RAG pipeline
 * Structured JSON output with strict schema enforcement
-* Confidence scoring for decision reliability
 * Risk classification: LOW / MEDIUM / HIGH
 * Explainable reasoning with policy-backed evidence
 * Safer alternative recommendation engine
@@ -67,7 +66,6 @@ Answers:
 Transforms policy context into structured decision output:
 
 * risk classification (LOW / MEDIUM / HIGH)
-* confidence scoring
 * reasoning generation
 * recommendation engine
 * safer alternative suggestion
