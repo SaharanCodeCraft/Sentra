@@ -107,18 +107,23 @@ Architecture principles:
 SENTRA/
 │
 ├── backend/
-│   ├── api/
-│   ├── core/
-│   ├── models/
-│   ├── services/
-│   ├── rag/
-│   └── main.py
+│   ├── main.py                 
+│   └── requirements.txt        
 │
-├── frontend/
-├── data/
-├── docs/
-├── requirements.txt
-└── README.md
+├── frontend/sentra-ui/
+│   ├── public/                 
+│   ├── src/                    
+│   │   ├── assets/             
+│   │   ├── App.css             
+│   │   ├── App.jsx             
+│   │   ├── index.css           
+│   │   └── main.jsx           
+│   ├── index.html              
+│   ├── package.json            
+│   └── vite.config.js          
+│
+├── .gitignore                  
+└── README.md                   
 ```
 
 ---
